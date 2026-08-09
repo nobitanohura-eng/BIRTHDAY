@@ -71,6 +71,18 @@ const videoCard = $('videoCard');
 const bdayVideo = $('bdayVideo');
 const creditBadge = $('creditBadge');
 
+/* Video path fallback for manual drag-and-drop GitHub Pages deployments */
+if (bdayVideo) {
+  bdayVideo.addEventListener('error', () => {
+    const currentSrc = bdayVideo.src || '';
+    if (!currentSrc.includes('public/')) {
+      console.log("Video not found at root, falling back to public/ path");
+      bdayVideo.src = './public/birthday-video.mp4';
+      bdayVideo.load();
+    }
+  }, true);
+}
+
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const isRecord     = new URLSearchParams(location.search).has('record');
 
@@ -505,6 +517,11 @@ function showWish(on){
   } else {
     bdayVideo.pause();
     bdayVideo.currentTime = 0;
+    bdayVideo.muted = true;
+    const muteIcon = $('muteIcon');
+    const unmuteIcon = $('unmuteIcon');
+    if (muteIcon) muteIcon.style.display = 'block';
+    if (unmuteIcon) unmuteIcon.style.display = 'none';
     
     // Reset Modal state
     const wishModal = $('wishModal');
@@ -1089,5 +1106,24 @@ if (candleFlame) {
         wishLetter.classList.add('is-revealed');
       }
     });
+  });
+}
+
+/* Polaroid Video Mute Button Listener */
+const videoMuteBtn = $('videoMuteBtn');
+const muteIcon = $('muteIcon');
+const unmuteIcon = $('unmuteIcon');
+
+if (videoMuteBtn) {
+  videoMuteBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    bdayVideo.muted = !bdayVideo.muted;
+    if (bdayVideo.muted) {
+      muteIcon.style.display = 'block';
+      unmuteIcon.style.display = 'none';
+    } else {
+      muteIcon.style.display = 'none';
+      unmuteIcon.style.display = 'block';
+    }
   });
 }
